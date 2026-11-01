@@ -1,0 +1,203 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   // Owner, Admin / Manager, Waiter, Kitchen Staff, Cashier
+  employeeId   String?
+  createdAt    DateTime @default(now())
+}
+
+model Restaurant {
+  id                  String   @id @default("rest-1")
+  name                String
+  tagline             String
+  description         String
+  coverImageUrl       String
+  address             String
+  phone               String
+  email               String
+  currencySymbol      String   @default("$")
+  currencyCode        String   @default("USD")
+  taxRatePercent      Float    @default(8.5)
+  serviceChargePercent Float   @default(5.0)
+  openingHours        String
+  weeklyScheduleJson  String
+  cuisineTypesJson    String
+  facilitiesJson      String
+  qrPaymentJson       String
+  tippingOptionsJson  String
+  updatedAt           DateTime @updatedAt
+}
+
+model MenuCategory {
+  id           String     @id @default(cuid())
+  name         String
+  slug         String     @unique
+  displayOrder Int
+  description  String?
+  items        MenuItem[]
+}
+
+model MenuItem {
+  id                 String       @id @default(cuid())
+  name               String
+  categoryId         String
+  category           MenuCategory @relation(fields: [categoryId], references: [id])
+  description        String
+  price              Float
+  originalPrice      Float?
+  image              String
+  rating             Float        @default(5.0)
+  reviewsCount       Int          @default(0)
+  preparationMinutes Int          @default(15)
+  isAvailable        Boolean      @default(true)
+  isSoldOut          Boolean      @default(false)
+  isFeatured         Boolean      @default(false)
+  isPopular          Boolean      @default(false)
+  dietaryJson        String       // JSON array
+  ingredientsJson    String       // JSON array
+  allergensJson      String       // JSON array
+  variantsJson       String?      // JSON array
+  addonsJson         String?      // JSON array
+  orderItems         OrderItem[]
+}
+
+model DiningTable {
+  id               String         @id @default(cuid())
+  tableNumber      String         @unique
+  capacity         Int
+  section          String
+  status           String         @default("Available")
+  assignedWaiterId String?
+  currentSessionId String?
+  qrCodeUrl        String
+  qrSecretToken    String
+  sessions         TableSession[]
+}
+
+model TableSession {
+  id                      String      @id @default(cuid())
+  tableNumber             String
+  table                   DiningTable @relation(fields: [tableNumber], references: [tableNumber])
+  token                   String
+  startedAt               DateTime    @default(now())
+  subtotalAccumulated     Float       @default(0)
+  taxAccumulated          Float       @default(0)
+  serviceChargeAccumulated Float      @default(0)
+  totalAccumulated        Float       @default(0)
+  paymentStatus           String      @default("unpaid")
+  reviewSubmitted         Boolean     @default(false)
+  orders                  Order[]
+  payments                Payment[]
+}
+
+model Order {
+  id                 String       @id @default(cuid())
+  orderNumber        String       @unique
+  tableNumber        String
+  sessionId          String
+  session            TableSession @relation(fields: [sessionId], references: [id])
+  waiterId           String?
+  subtotal           Float
+  tax                Float
+  serviceCharge      Float
+  discount           Float        @default(0)
+  total              Float
+  status             String       @default("Order Placed")
+  estimatedMinutes   Int          @default(20)
+  cancellationReason String?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  items              OrderItem[]
+}
+
+model OrderItem {
+  id                String   @id @default(cuid())
+  orderId           String
+  order             Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItemId        String
+  menuItem          MenuItem @relation(fields: [menuItemId], references: [id])
+  name              String
+  quantity          Int
+  unitPrice         Float
+  totalPrice        Float
+  customizationJson String?
+  kdsStatus         String   @default("Pending")
+}
+
+model Payment {
+  id                   String       @id @default(cuid())
+  sessionId            String
+  session              TableSession @relation(fields: [sessionId], references: [id])
+  tableNumber          String
+  method               String
+  subtotal             Float
+  tax                  Float
+  serviceCharge        Float
+  tipAmount            Float        @default(0)
+  totalAmount          Float
+  status               String       @default("pending_verification")
+  transactionReference String?
+  receiptNote          String?
+  createdAt            DateTime     @default(now())
+  verifiedAt           DateTime?
+  verifiedBy           String?
+}
+
+model WaiterProfile {
+  id                 String   @id @default(cuid())
+  employeeId         String   @unique
+  name               String
+  photoUrl           String
+  role               String
+  phone              String
+  email              String
+  assignedTablesJson String
+  isActive           Boolean  @default(true)
+  totalTips          Float    @default(0)
+  rating             Float    @default(5.0)
+  ratingCount        Int      @default(0)
+  tips               Tip[]
+}
+
+model Tip {
+  id            String        @id @default(cuid())
+  tableNumber   String
+  sessionId     String
+  waiterId      String
+  waiter        WaiterProfile @relation(fields: [waiterId], references: [id])
+  waiterName    String
+  amount        Float
+  percentage    Int?
+  paymentMethod String
+  status        String        @default("pending")
+  createdAt     DateTime      @default(now())
+}
+
+model CustomerReview {
+  id                String   @id @default(cuid())
+  sessionId         String?
+  tableNumber       String?
+  customerName      String
+  overallRating     Float
+  foodRating        Float
+  serviceRating     Float
+  cleanlinessRating Float
+  valueRating       Float
+  comment           String
+  photoUrl          String?
+  isVerifiedDiner   Boolean  @default(false)
+  isModerated       Boolean  @default(false)
+  adminReply        String?
+  createdAt         DateTime @default(now())
+}

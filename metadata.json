@@ -1,0 +1,6 @@
+{
+  "name": "L'Aura - Digital Restaurant Ordering & Management Ecosystem",
+  "description": "Luxury digital dine-in ordering, QR table sessions, waiter tipping, real-time kitchen display, and complete restaurant administration.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
