@@ -15,8 +15,11 @@ import { ReviewModal } from './components/ReviewModal.tsx';
 import { TableSimulatorModal } from './components/TableSimulatorModal.tsx';
 import { AdminDashboard } from './components/AdminDashboard.tsx';
 import { AdminAuthModal } from './components/AdminAuthModal.tsx';
+import { ReservationModal } from './components/ReservationModal.tsx';
+import { ServiceBellModal } from './components/ServiceBellModal.tsx';
 import { KDSView } from './components/KDSView.tsx';
 import { StoryAndInfoSection } from './components/StoryAndInfoSection.tsx';
+import { sounds } from './utils/sound.ts';
 
 import {
   MenuItem,
@@ -60,6 +63,8 @@ export default function App() {
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
+  const [isReservationOpen, setIsReservationOpen] = useState(false);
+  const [isServiceBellOpen, setIsServiceBellOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isKdsOpen, setIsKdsOpen] = useState(false);
 
@@ -155,6 +160,7 @@ export default function App() {
       specialInstructions: customization.specialInstructions,
     };
     setCartItems(prev => [...prev, newCartItem]);
+    sounds.playChime();
     setIsCartOpen(true);
   };
 
@@ -166,6 +172,7 @@ export default function App() {
       selectedVariant: item.variants && item.variants.length > 0 ? item.variants[0] : undefined,
     };
     setCartItems(prev => [...prev, newCartItem]);
+    sounds.playChime();
     setIsCartOpen(true);
   };
 
@@ -210,6 +217,7 @@ export default function App() {
     setCartItems([]);
     setCurrentSession(res.session);
     setSessionOrders(prev => [res.order, ...prev]);
+    sounds.playSuccess();
     setIsOrderTrackingOpen(true);
   };
 
@@ -332,6 +340,8 @@ export default function App() {
         onOpenSimulator={() => setIsSimulatorOpen(true)}
         onOpenStaff={handleOpenStaffPortal}
         onOpenAuth={() => setIsAuthModalOpen(true)}
+        onOpenReservation={() => setIsReservationOpen(true)}
+        onOpenServiceBell={() => setIsServiceBellOpen(true)}
         authUser={authUser}
         currentSession={currentSession}
         activeTableNumber={activeTableNumber}
@@ -358,6 +368,7 @@ export default function App() {
         settings={settings}
         onExploreMenu={() => scrollToSection('menu')}
         onOpenSimulator={() => setIsSimulatorOpen(true)}
+        onOpenReservation={() => setIsReservationOpen(true)}
         activeTableNumber={activeTableNumber}
       />
 
@@ -389,6 +400,21 @@ export default function App() {
         currentUser={authUser}
         onLoginSuccess={handleLoginSuccess}
         onLogout={handleLogout}
+      />
+
+      {/* Table Reservation Booking Modal */}
+      <ReservationModal
+        isOpen={isReservationOpen}
+        onClose={() => setIsReservationOpen(false)}
+        settings={settings}
+      />
+
+      {/* Tableside Digital Pager / Service Bell Modal */}
+      <ServiceBellModal
+        isOpen={isServiceBellOpen}
+        onClose={() => setIsServiceBellOpen(false)}
+        tableNumber={activeTableNumber}
+        assignedWaiter={assignedWaiter}
       />
 
       {/* Dish Customization Modal */}

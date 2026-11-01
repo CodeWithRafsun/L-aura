@@ -6,6 +6,7 @@ interface HeroSectionProps {
   settings: RestaurantSettings;
   onExploreMenu: () => void;
   onOpenSimulator: () => void;
+  onOpenReservation: () => void;
   activeTableNumber: string | null;
 }
 
@@ -13,6 +14,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   settings,
   onExploreMenu,
   onOpenSimulator,
+  onOpenReservation,
   activeTableNumber,
 }) => {
   return (
@@ -68,18 +70,25 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             <div className="flex flex-wrap items-center gap-4 pt-2">
               <button
                 onClick={onExploreMenu}
-                className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-medium text-sm bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-amber-400 dark:text-neutral-950 dark:hover:bg-amber-300 shadow-md transition-colors"
+                className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-medium text-sm bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-amber-400 dark:text-neutral-950 dark:hover:bg-amber-300 shadow-md transition-colors font-bold"
               >
                 <span>Browse Tasting Menu</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
               <button
+                onClick={onOpenReservation}
+                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl font-medium text-sm bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-900 dark:text-neutral-100 transition-colors"
+              >
+                <span>Reserve a Table</span>
+              </button>
+
+              <button
                 onClick={onOpenSimulator}
-                className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-medium text-sm bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100 hover:bg-neutral-50 dark:hover:bg-neutral-800/80 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-3.5 rounded-xl font-medium text-xs bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800/80 transition-colors"
               >
                 <QrCode className="w-4 h-4 text-amber-500" />
-                <span>Simulate Table QR Scan</span>
+                <span>Simulate Table QR</span>
               </button>
             </div>
 

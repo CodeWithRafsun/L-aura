@@ -151,6 +151,22 @@ export const FoodDetailModal: React.FC<FoodDetailModalProps> = ({
               </div>
             </div>
 
+            {/* Sommelier Pairing & Cellar Elevation */}
+            <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 space-y-1.5">
+              <span className="text-[11px] font-serif font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300">
+                Sommelier Wine & Spirit Pairing
+              </span>
+              <p className="text-xs text-neutral-800 dark:text-neutral-200 leading-relaxed">
+                {item.categoryId === 'cat-3'
+                  ? 'Paired with Château Pontet-Canet Grand Cru Classé Pauillac 2015, or our signature Smoked Rosemary Old Fashioned.'
+                  : item.categoryId === 'cat-2'
+                  ? 'Paired with Domaine Leflaive Meursault 2020, or an Elysian Botanical Highball.'
+                  : item.categoryId === 'cat-6'
+                  ? 'Paired with Château d’Yquem Sauternes 2016, or an artisanal Single-Origin Espresso Affogato.'
+                  : 'Paired with Champagne Jacques Selosse Brut Initial, or a Clarified Green Apple Highball.'}
+              </p>
+            </div>
+
             {/* Variants (e.g. Doneness) */}
             {item.variants && item.variants.length > 0 && (
               <div className="space-y-2">

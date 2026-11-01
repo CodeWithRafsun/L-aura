@@ -40,11 +40,13 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
   );
   const [selectedTipPercent, setSelectedTipPercent] = useState<number | 'custom' | 0>(18);
   const [customTipAmount, setCustomTipAmount] = useState<string>('');
+  const [splitCount, setSplitCount] = useState<number>(1);
   const [transactionRef, setTransactionRef] = useState<string>('');
   const [receiptNote, setReceiptNote] = useState<string>('');
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isComplete, setIsComplete] = useState<boolean>(false);
+  const [showPrintReceipt, setShowPrintReceipt] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const baseBill = session ? session.totalAccumulated : 0;
@@ -169,6 +171,46 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                     {settings.currencySymbol}{finalGrandTotal.toFixed(2)}
                   </div>
                 </div>
+              </div>
+
+              {/* Bill Split Calculator */}
+              <div className="p-3.5 rounded-xl bg-amber-500/5 border border-amber-500/20 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div>
+                  <span className="font-semibold text-neutral-800 dark:text-neutral-200 block">
+                    Split Bill Evenly
+                  </span>
+                  <p className="text-[11px] text-neutral-500">
+                    Calculate share per guest at the table
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  {[1, 2, 3, 4, 6].map(count => (
+                    <button
+                      key={count}
+                      type="button"
+                      onClick={() => setSplitCount(count)}
+                      className={`px-2.5 py-1 rounded-lg font-mono text-xs font-semibold transition-colors ${
+                        splitCount === count
+                          ? 'bg-neutral-900 text-white dark:bg-amber-400 dark:text-neutral-950 font-bold'
+                          : 'bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700'
+                      }`}
+                    >
+                      {count === 1 ? 'Solo' : `÷${count}`}
+                    </button>
+                  ))}
+                </div>
+
+                {splitCount > 1 && (
+                  <div className="w-full pt-2 border-t border-amber-500/20 flex justify-between items-center font-mono">
+                    <span className="text-neutral-600 dark:text-neutral-300 text-[11px]">
+                      Each Guest Pays ({splitCount} ways):
+                    </span>
+                    <span className="text-sm font-bold text-amber-600 dark:text-amber-400">
+                      {settings.currencySymbol}{(finalGrandTotal / splitCount).toFixed(2)}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* Waiter Selection Section */}

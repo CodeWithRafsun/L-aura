@@ -8,6 +8,8 @@ interface NavbarProps {
   onOpenSimulator: () => void;
   onOpenStaff: () => void;
   onOpenAuth: () => void;
+  onOpenReservation: () => void;
+  onOpenServiceBell: () => void;
   authUser: any | null;
   currentSession: TableSession | null;
   activeTableNumber: string | null;
@@ -22,6 +24,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenSimulator,
   onOpenStaff,
   onOpenAuth,
+  onOpenReservation,
+  onOpenServiceBell,
   authUser,
   activeTableNumber,
   isDark,
@@ -53,6 +57,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             className="hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors whitespace-nowrap shrink-0"
           >
             Digital Menu
+          </button>
+          <button
+            onClick={onOpenReservation}
+            className="hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors whitespace-nowrap shrink-0"
+          >
+            Reserve Table
           </button>
           <button
             onClick={onOpenSimulator}
@@ -87,13 +97,24 @@ export const Navbar: React.FC<NavbarProps> = ({
             {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4" />}
           </button>
 
+          {/* Tableside Service Bell Button */}
+          {activeTableNumber && (
+            <button
+              onClick={onOpenServiceBell}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 transition-colors"
+              title="Summon Waiter"
+            >
+              <span>🔔 Call Waiter</span>
+            </button>
+          )}
+
           {/* Table active status marker if dining */}
           {activeTableNumber && (
             <button
               onClick={onOpenSimulator}
-              className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 text-xs font-mono font-medium rounded-md bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/30 whitespace-nowrap"
+              className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 text-xs font-mono font-medium rounded-md bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border border-neutral-300 dark:border-neutral-700 whitespace-nowrap"
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
               <span>Table {activeTableNumber}</span>
             </button>
           )}

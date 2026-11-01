@@ -342,6 +342,61 @@ export const api = {
     return res.json();
   },
 
+  async createServiceRequest(payload: { tableNumber: string; requestType: string; note?: string }): Promise<any> {
+    const res = await fetch(`${BASE_URL}/service-requests`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error('Failed to send service request');
+    return res.json();
+  },
+
+  async getServiceRequests(): Promise<any[]> {
+    const res = await fetch(`${BASE_URL}/service-requests`, {
+      headers: { ...getAuthHeader() },
+    });
+    if (!res.ok) throw new Error('Failed to load service requests');
+    return res.json();
+  },
+
+  async updateServiceRequestStatus(id: string, status: string): Promise<any> {
+    const res = await fetch(`${BASE_URL}/service-requests/${id}/status`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+      body: JSON.stringify({ status }),
+    });
+    if (!res.ok) throw new Error('Failed to update service request');
+    return res.json();
+  },
+
+  async createReservation(payload: {
+    guestName: string;
+    guestEmail: string;
+    guestPhone?: string;
+    partySize: number;
+    date: string;
+    timeSlot: string;
+    section: string;
+    specialRequests?: string;
+  }): Promise<any> {
+    const res = await fetch(`${BASE_URL}/reservations`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error('Failed to submit reservation');
+    return res.json();
+  },
+
+  async getReservations(): Promise<any[]> {
+    const res = await fetch(`${BASE_URL}/reservations`, {
+      headers: { ...getAuthHeader() },
+    });
+    if (!res.ok) throw new Error('Failed to load reservations');
+    return res.json();
+  },
+
   async resetDatabase(): Promise<void> {
     const res = await fetch(`${BASE_URL}/system/reset`, {
       method: 'POST',

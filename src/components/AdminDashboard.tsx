@@ -46,7 +46,7 @@ interface AdminDashboardProps {
   onLogout: () => void;
 }
 
-type TabType = 'overview' | 'tables' | 'orders' | 'menu' | 'waiters' | 'payments' | 'reviews' | 'settings';
+type TabType = 'overview' | 'tables' | 'orders' | 'services' | 'reservations' | 'menu' | 'waiters' | 'payments' | 'reviews' | 'settings';
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onClose,
@@ -76,6 +76,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [selectedTableDetail, setSelectedTableDetail] = useState<any | null>(null);
   const [adminReplyText, setAdminReplyText] = useState<{ [id: string]: string }>({});
 
+  const [serviceRequests, setServiceRequests] = useState<any[]>([]);
+  const [reservations, setReservations] = useState<any[]>([]);
+  const [isFloorPlanMapOpen, setIsFloorPlanMapOpen] = useState(false);
+
   const refreshAll = async () => {
     setLoading(true);
     try {
@@ -88,7 +92,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         paymentsData,
         reviewsData,
         tipsData,
-        settingsData
+        settingsData,
+        servicesData,
+        reservationsData
       ] = await Promise.all([
         api.getAnalytics(),
         api.getTables(),
@@ -99,6 +105,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         api.getReviews(),
         api.getTipsAnalytics(),
         api.getSettings(),
+        api.getServiceRequests(),
+        api.getReservations(),
       ]);
 
       setAnalytics(statsData);
@@ -111,6 +119,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       setReviews(reviewsData);
       setTipsAnalytics(tipsData);
       setSettings(settingsData);
+      setServiceRequests(servicesData);
+      setReservations(reservationsData);
     } catch (err) {
       console.error('Failed to load dashboard data:', err);
     } finally {
@@ -316,6 +326,38 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 {analytics.pendingOrdersCount}
               </span>
             )}
+          </button>
+
+          <button
+            onClick={() => setActiveTab('services')}
+            className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-colors ${
+              activeTab === 'services' ? 'bg-amber-500/15 text-amber-300 font-semibold' : 'text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200'
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-amber-400">🔔</span>
+              <span>Service Calls</span>
+            </div>
+            {serviceRequests.length > 0 && (
+              <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-rose-500 text-white animate-pulse">
+                {serviceRequests.length}
+              </span>
+            )}
+          </button>
+
+          <button
+            onClick={() => setActiveTab('reservations')}
+            className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-colors ${
+              activeTab === 'reservations' ? 'bg-amber-500/15 text-amber-300 font-semibold' : 'text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200'
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-amber-400">📅</span>
+              <span>Table Bookings</span>
+            </div>
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-neutral-400">
+              {reservations.length}
+            </span>
           </button>
 
           <button
@@ -740,6 +782,145 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* ============================================================== */}
+          {/* TAB: SERVICE BELL CALLS */}
+          {/* ============================================================== */}
+          {activeTab === 'services' && (
+            <div className="space-y-6 max-w-6xl">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-serif font-semibold text-white">
+                    Tableside Guest Service Pagers
+                  </h2>
+                  <p className="text-xs text-neutral-400 mt-1">
+                    Live requests summoned by seated diners via table digital service bell.
+                  </p>
+                </div>
+                <span className="text-xs font-mono px-3 py-1 rounded-lg bg-neutral-800 text-amber-400 border border-neutral-700">
+                  {serviceRequests.length} Active Calls
+                </span>
+              </div>
+
+              {serviceRequests.length === 0 ? (
+                <div className="p-12 text-center rounded-2xl bg-neutral-900 border border-neutral-800 space-y-2">
+                  <span className="text-3xl block">🔔</span>
+                  <p className="font-serif text-base text-neutral-300">All Tableside Pagers Clear</p>
+                  <p className="text-xs text-neutral-500">When seated diners ring for water, sommelier, or bill, alerts appear here instantly.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {serviceRequests.map(req => (
+                    <div
+                      key={req.id}
+                      className="p-5 rounded-xl bg-neutral-900 border border-neutral-800 space-y-3 flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-lg font-mono font-bold text-amber-400">
+                            Table {req.tableNumber}
+                          </span>
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                            {req.status}
+                          </span>
+                        </div>
+                        <h4 className="text-sm font-semibold text-white mt-1">
+                          {req.requestType}
+                        </h4>
+                        {req.note && (
+                          <p className="text-xs italic text-neutral-400 mt-1 bg-neutral-800/60 p-2 rounded-lg">
+                            "{req.note}"
+                          </p>
+                        )}
+                        <span className="text-[10px] text-neutral-500 block mt-2">
+                          Summoned {new Date(req.createdAt).toLocaleTimeString()}
+                        </span>
+                      </div>
+
+                      <div className="pt-3 border-t border-neutral-800 flex gap-2">
+                        <button
+                          onClick={async () => {
+                            await api.updateServiceRequestStatus(req.id, 'Resolved');
+                            await refreshAll();
+                          }}
+                          className="flex-1 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-neutral-950 font-bold text-xs"
+                        >
+                          Mark Handled & Clear
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ============================================================== */}
+          {/* TAB: RESERVATIONS & BOOKINGS */}
+          {/* ============================================================== */}
+          {activeTab === 'reservations' && (
+            <div className="space-y-6 max-w-6xl">
+              <div>
+                <h2 className="text-2xl font-serif font-semibold text-white">
+                  Table Reservations & Guest Bookings
+                </h2>
+                <p className="text-xs text-neutral-400 mt-1">
+                  Manage incoming party bookings, preferred atmospheres, and occasion notes.
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-neutral-800 bg-neutral-900 overflow-hidden">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-neutral-800/60 text-neutral-400 uppercase tracking-wider text-[10px]">
+                    <tr>
+                      <th className="p-3.5">Booking Code</th>
+                      <th className="p-3.5">Guest & Contact</th>
+                      <th className="p-3.5">Party Size</th>
+                      <th className="p-3.5">Date & Seating</th>
+                      <th className="p-3.5">Atmosphere</th>
+                      <th className="p-3.5">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-neutral-800">
+                    {reservations.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="p-8 text-center text-neutral-500">
+                          No table reservations booked yet.
+                        </td>
+                      </tr>
+                    ) : (
+                      reservations.map(res => (
+                        <tr key={res.id} className="hover:bg-neutral-800/40">
+                          <td className="p-3.5 font-mono font-bold text-amber-400">
+                            {res.bookingCode}
+                          </td>
+                          <td className="p-3.5">
+                            <strong className="text-neutral-100 block">{res.guestName}</strong>
+                            <span className="text-[10px] text-neutral-400">{res.guestEmail}</span>
+                          </td>
+                          <td className="p-3.5 font-mono">
+                            {res.partySize} Guests
+                          </td>
+                          <td className="p-3.5">
+                            <span className="text-neutral-200 block">{res.date}</span>
+                            <span className="font-mono text-neutral-400 text-[10px]">{res.timeSlot}</span>
+                          </td>
+                          <td className="p-3.5 text-neutral-300">
+                            {res.section}
+                          </td>
+                          <td className="p-3.5">
+                            <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                              {res.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
               </div>
             </div>
           )}

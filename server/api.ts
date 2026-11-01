@@ -97,7 +97,7 @@ apiRouter.post('/auth/logout', (req: Request, res: Response) => {
 // ==========================================
 // 1. RESTAURANT SETTINGS (PRISMA)
 // ==========================================
-apiRouter.get('/restaurant', async (_req: Request, res: Response) => {
+apiRouter.get(['/restaurant', '/settings'], async (_req: Request, res: Response) => {
   try {
     const rest = await prisma.restaurant.findFirst();
     if (!rest) {
@@ -1019,6 +1019,104 @@ apiRouter.get('/analytics', async (_req: Request, res: Response) => {
       totalTips,
       pendingPaymentsCount,
     });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ==========================================
+// 9. SERVICE BELL & TABLESIDE REQUESTS
+// ==========================================
+apiRouter.post('/service-requests', async (req: Request, res: Response) => {
+  try {
+    const { tableNumber, requestType, type, note } = req.body;
+    const finalType = requestType || type;
+    if (!tableNumber || !finalType) {
+      res.status(400).json({ error: 'Table number and request type are required.' });
+      return;
+    }
+
+    const created = await prisma.serviceRequest.create({
+      data: {
+        tableNumber,
+        requestType: finalType,
+        note: note || null,
+        status: 'Pending',
+      },
+    });
+
+    res.status(201).json({ success: true, request: created });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+apiRouter.get('/service-requests', async (_req: Request, res: Response) => {
+  try {
+    const requests = await prisma.serviceRequest.findMany({
+      where: { status: { in: ['Pending', 'Acknowledged'] } },
+      orderBy: { createdAt: 'desc' },
+    });
+    res.json(requests);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+apiRouter.put('/service-requests/:id/status', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const updated = await prisma.serviceRequest.update({
+      where: { id },
+      data: { status },
+    });
+    res.json(updated);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ==========================================
+// 10. RESERVATIONS & BOOKING ENGINE
+// ==========================================
+apiRouter.post('/reservations', async (req: Request, res: Response) => {
+  try {
+    const { guestName, guestEmail, guestPhone, partySize, date, timeSlot, section, specialRequests } = req.body;
+    if (!guestName || !guestEmail || !date || !timeSlot) {
+      res.status(400).json({ error: 'Name, email, date, and time slot are required.' });
+      return;
+    }
+
+    const bookingCode = `RES-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    const reservation = await prisma.reservation.create({
+      data: {
+        bookingCode,
+        guestName,
+        guestEmail,
+        guestPhone: guestPhone || '',
+        partySize: Number(partySize) || 2,
+        date,
+        timeSlot,
+        section: section || 'Main Dining Room',
+        specialRequests: specialRequests || null,
+        status: 'Confirmed',
+      },
+    });
+
+    res.status(201).json({ success: true, reservation });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+apiRouter.get('/reservations', async (_req: Request, res: Response) => {
+  try {
+    const reservations = await prisma.reservation.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+    res.json(reservations);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }

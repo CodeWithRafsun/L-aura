@@ -52,32 +52,32 @@ export const StoryAndInfoSection: React.FC<StoryAndInfoSectionProps> = ({
             <div className="space-y-4">
               <div className="rounded-2xl overflow-hidden aspect-[4/5] bg-neutral-900 shadow-lg">
                 <img
-                  src="/src/assets/images/food_signature_wagyu_1793555392859.jpg"
-                  alt="Wood-Fired Wagyu"
+                  src="/src/assets/images/wine_sommelier_cellar_1793557153067.jpg"
+                  alt="L'Aura Sommelier Cellar Salon"
                   className="w-full h-full object-cover"
                   loading="lazy"
                   referrerPolicy="no-referrer"
                 />
               </div>
               <div className="p-4 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-xs text-neutral-600 dark:text-neutral-400">
-                <strong className="text-neutral-900 dark:text-neutral-100 block mb-1">Miyazaki A5 Wagyu</strong>
-                Truffle potato silk with 36-hour bone reduction.
+                <strong className="text-neutral-900 dark:text-neutral-100 block mb-1">Sommelier Cellar Vault</strong>
+                Over 600 biodynamic and grand cru vintages.
               </div>
             </div>
 
             <div className="space-y-4 pt-8">
               <div className="rounded-2xl overflow-hidden aspect-[4/5] bg-neutral-900 shadow-lg">
                 <img
-                  src="/src/assets/images/food_artisan_pasta_1793555393056.jpg"
-                  alt="Squid Ink Pasta with Lobster"
+                  src="/src/assets/images/garden_terrace_dining_1793557153816.jpg"
+                  alt="Upper Terrace Garden Al Fresco"
                   className="w-full h-full object-cover"
                   loading="lazy"
                   referrerPolicy="no-referrer"
                 />
               </div>
               <div className="p-4 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-xs text-neutral-600 dark:text-neutral-400">
-                <strong className="text-neutral-900 dark:text-neutral-100 block mb-1">Maine Lobster Tagliolini</strong>
-                Iranian saffron emulsion and bronze basil.
+                <strong className="text-neutral-900 dark:text-neutral-100 block mb-1">Al Fresco Garden Terrace</strong>
+                Evening dining beneath centuries-old olive trees.
               </div>
             </div>
           </div>

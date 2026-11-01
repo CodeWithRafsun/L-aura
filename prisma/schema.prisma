@@ -201,3 +201,27 @@ model CustomerReview {
   adminReply        String?
   createdAt         DateTime @default(now())
 }
+
+model Reservation {
+  id              String   @id @default(cuid())
+  bookingCode     String   @unique
+  guestName       String
+  guestEmail      String
+  guestPhone      String
+  partySize       Int
+  date            String
+  timeSlot        String
+  section         String
+  specialRequests String?
+  status          String   @default("Confirmed")
+  createdAt       DateTime @default(now())
+}
+
+model ServiceRequest {
+  id          String   @id @default(cuid())
+  tableNumber String
+  requestType String
+  note        String?
+  status      String   @default("Pending")
+  createdAt   DateTime @default(now())
+}
